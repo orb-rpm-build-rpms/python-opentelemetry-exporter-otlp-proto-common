@@ -15,6 +15,12 @@ Source:         %{pypi_source opentelemetry_exporter_otlp_proto_common}
 
 BuildArch:      noarch
 BuildRequires:  python3-devel
+# The encoder modules (trace_encoder/metrics_encoder and _internal) import
+# opentelemetry.sdk unconditionally at module load, but upstream's metadata only
+# declares opentelemetry-proto, so the automatic dependency generator never emits
+# a Requires for the SDK. Add it manually (see the Requires below); it is needed
+# here so the import check can load those modules.
+BuildRequires:  python3dist(opentelemetry-sdk)
 
 
 # Fill in the actual package description to submit package to Fedora
@@ -25,6 +31,9 @@ This is package 'opentelemetry-exporter-otlp-proto-common' generated automatical
 
 %package -n     python3-opentelemetry-exporter-otlp-proto-common
 Summary:        %{summary}
+# opentelemetry-sdk is a hard runtime dependency (the encoders import it at load)
+# that upstream fails to declare, so the automatic generator does not pick it up.
+Requires:       python3dist(opentelemetry-sdk)
 
 %description -n python3-opentelemetry-exporter-otlp-proto-common %_description
 
